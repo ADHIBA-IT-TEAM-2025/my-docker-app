@@ -12,7 +12,7 @@ function App() {
 
   return (
     <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>Frontend (React + Docker) ⚛️ + sanju api</h1>
+      <h1>Frontend (React + Docker) ⚛️ HARI api </h1>
       <h2>{message}</h2>
     </div>
   );
