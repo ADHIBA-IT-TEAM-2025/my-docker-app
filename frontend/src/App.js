@@ -12,7 +12,7 @@ function App() {
 
   return (
     <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>Frontend (React + Docker) ⚛️ jenkins </h1>
+      <h1>Frontend (React + Docker) ⚛️ jenkins 02</h1>
       <h2>{message}</h2>
     </div>
   );
