@@ -32,12 +32,13 @@ pipeline {
             }
         }
 
-        stage('Build Docker Images') {
-            steps {
-                sh 'docker build -t sanjeev26082002/backend ./backend'
-                sh 'docker build -t sanjeev26082002/frontend ./frontend'
-            }
-        }
+       stage('Build Docker Images') {
+    steps {
+        sh 'docker build -t sanjeev26082002/backend -f ./backend/Dockerfile.backend ./backend'
+        sh 'docker build -t sanjeev26082002/frontend -f ./frontend/Dockerfile.frontend ./frontend'
+    }
+}
+
 
         stage('Push to Docker Hub') {
             steps {
