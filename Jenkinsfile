@@ -2,32 +2,21 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/YourUsername/my-docker-app.git'
+                sh '''
+                  if [ -d ".git" ]; then
+                    git pull origin main
+                  else
+                    git clone https://github.com/ADHIBA-IT-TEAM-2025/my-docker-app.git .
+                  fi
+                '''
             }
         }
-
-        stage('Build Docker Images') {
+        stage('Build and Run with Docker Compose') {
             steps {
-                sh 'docker-compose build'
+                sh 'docker-compose up --build -d'
             }
-        }
-
-        stage('Run Containers') {
-            steps {
-                // stop old containers if running
-                sh 'docker-compose down || true'
-                // run new containers
-                sh 'docker-compose up -d'
-            }
-        }
-    }
-
-    post {
-        always {
-            sh 'docker ps -a'
         }
     }
 }
