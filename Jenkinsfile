@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_HUB_USER = 'sanjeev26082002'
-        DOCKER_HUB_PASS = 'Sanju@02'
+        DOCKER_HUB_PASS = 'Sanju@02/'
     }
 
     stages {
