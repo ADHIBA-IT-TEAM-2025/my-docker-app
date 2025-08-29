@@ -2,32 +2,22 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/YourUsername/my-docker-app.git'
+                git url: 'https://github.com/ADHIBA-IT-TEAM-2025/my-docker-app.git', branch: 'main'
             }
         }
 
-        stage('Build Docker Images') {
+        stage('Build') {
             steps {
                 sh 'docker-compose build'
             }
         }
 
-        stage('Run Containers') {
+        stage('Run') {
             steps {
-                // stop old containers if running
-                sh 'docker-compose down || true'
-                // run new containers
                 sh 'docker-compose up -d'
             }
-        }
-    }
-
-    post {
-        always {
-            sh 'docker ps -a'
         }
     }
 }
