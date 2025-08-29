@@ -14,7 +14,7 @@ useEffect(() => {
   return (
     <div style={{ textAlign: "center", marginTop: "50px" }}>
       <h1>Frontend (React)</h1>
-      <p>Message from Backend: {message}</p>
+      <p>Message from Backend 02: {message}</p>
     </div>
   );
 }
