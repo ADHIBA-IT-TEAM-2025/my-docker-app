@@ -6,7 +6,9 @@ pipeline {
         DOCKER_HUB_PASS = credentials('docker-hub-credentials') 
         // Add this credential in Jenkins (username+password or PAT)
     }
-
+tools {
+    nodejs "node18"
+}
     stages {
         stage('Checkout') {
             steps {
@@ -14,7 +16,14 @@ pipeline {
                     url: 'https://github.com/ADHIBA-IT-TEAM-2025/my-docker-app.git'
             }
         }
-
+ stage('Build Backend') {
+        steps {
+            dir('backend') {
+                sh 'npm install'
+                sh 'npm run build'
+            }
+        }
+    }
         stage('Build Backend') {
             steps {
                 dir('backend') {
