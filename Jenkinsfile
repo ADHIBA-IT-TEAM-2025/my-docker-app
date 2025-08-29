@@ -32,12 +32,15 @@ pipeline {
             }
         }
 
-        stage('Build Docker Images') {
-            steps {
-                sh "docker build -t ${BACKEND_IMAGE} -f ./backend/Dockerfile.backend ./backend"
-                sh "docker build -t ${FRONTEND_IMAGE} -f ./frontend/Dockerfile.frontend ./frontend"
-            }
+      stage('Build Docker Images') {
+    steps {
+        script {
+            def GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+            sh "docker build -t ${DOCKER_HUB_USER}/backend:${GIT_COMMIT_SHORT} -f ./backend/Dockerfile.backend ./backend"
+            sh "docker build -t ${DOCKER_HUB_USER}/frontend:${GIT_COMMIT_SHORT} -f ./frontend/Dockerfile.frontend ./frontend"
         }
+    }
+}
 
         stage('Push to Docker Hub') {
             steps {
