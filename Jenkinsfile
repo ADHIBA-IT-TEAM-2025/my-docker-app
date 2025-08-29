@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_USER = 'your-dockerhub-username'
+        DOCKER_HUB_USER = 'sanjeev26082002'
         DOCKER_HUB_PASS = credentials('docker-hub-credentials') 
         // Add this credential in Jenkins (username+password or PAT)
     }
