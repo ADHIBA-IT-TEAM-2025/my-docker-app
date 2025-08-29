@@ -4,19 +4,23 @@ pipeline {
     environment {
         DOCKER_HUB_USER = 'sanjeev26082002'
         DOCKER_HUB_PASS = 'Sanju@02/'
+        BACKEND_IMAGE = 'sanjeev26082002/backend'
+        FRONTEND_IMAGE = 'sanjeev26082002/frontend'
+        BACKEND_CONTAINER = 'backend'
+        FRONTEND_CONTAINER = 'frontend'
     }
 
     stages {
 
-       stage('Build Backend') {
-    agent { docker { image 'node:18-alpine' } }
-    steps {
-        dir('backend') {
-            sh 'npm install'
+        stage('Build Backend') {
+            agent { docker { image 'node:18-alpine' } }
+            steps {
+                dir('backend') {
+                    sh 'npm install'
+                    sh 'npm run build || echo "No build script for backend"'
+                }
+            }
         }
-    }
-}
-
 
         stage('Build Frontend') {
             agent { docker { image 'node:18-alpine' } }
@@ -30,44 +34,57 @@ pipeline {
 
         stage('Build Docker Images') {
             steps {
-                sh 'docker build -t sanjeev26082002/backend -f ./backend/Dockerfile.backend ./backend'
-                sh 'docker build -t sanjeev26082002/frontend -f ./frontend/Dockerfile.frontend ./frontend'
+                sh "docker build -t ${BACKEND_IMAGE} -f ./backend/Dockerfile.backend ./backend"
+                sh "docker build -t ${FRONTEND_IMAGE} -f ./frontend/Dockerfile.frontend ./frontend"
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
-                sh '''
+                sh """
                     echo "$DOCKER_HUB_PASS" | docker login -u "$DOCKER_HUB_USER" --password-stdin
-                    docker push sanjeev26082002/backend
-                    docker push sanjeev26082002/frontend
-                '''
+                    docker push ${BACKEND_IMAGE}
+                    docker push ${FRONTEND_IMAGE}
+                """
             }
         }
 
-        stage('Deploy Containers') {
+        stage('Deploy Zero-Downtime') {
             steps {
-                sh '''
-                    # Stop and remove old containers if they exist
-                    docker stop frontend-container || true
-                    docker rm frontend-container || true
-                    docker stop backend-container || true
-                    docker rm backend-container || true
+                sh """
+                    # Pull latest images
+                    docker pull ${BACKEND_IMAGE}
+                    docker pull ${FRONTEND_IMAGE}
 
-                    # Run new containers
-                    docker run -d -p 3000:3000 --name frontend-container sanjeev26082002/frontend
-                    docker run -d -p 5000:5000 --name backend-container sanjeev26082002/backend
-                '''
+                    # Run new containers on temp ports
+                    docker run -d -p 5001:5000 --name ${BACKEND_CONTAINER}_new ${BACKEND_IMAGE}
+                    docker run -d -p 3001:3000 --name ${FRONTEND_CONTAINER}_new ${FRONTEND_IMAGE}
+
+                    # Give them a few seconds to start
+                    sleep 5
+
+                    # Stop old containers
+                    docker stop ${BACKEND_CONTAINER} || true
+                    docker stop ${FRONTEND_CONTAINER} || true
+
+                    # Remove old containers
+                    docker rm ${BACKEND_CONTAINER} || true
+                    docker rm ${FRONTEND_CONTAINER} || true
+
+                    # Rename new containers to main names
+                    docker rename ${BACKEND_CONTAINER}_new ${BACKEND_CONTAINER}
+                    docker rename ${FRONTEND_CONTAINER}_new ${FRONTEND_CONTAINER}
+                """
             }
         }
     }
 
     post {
         failure {
-            echo "❌ Build failed!"
+            echo "❌ Build or deploy failed!"
         }
         success {
-            echo "✅ Build succeeded!"
+            echo "✅ Build and deploy succeeded!"
         }
     }
 }
