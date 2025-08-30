@@ -2,22 +2,27 @@ version: "3.8"
 
 services:
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.backend
+    container_name: my-backend
     ports:
       - "5000:5000"
     networks:
-      - mynetwork
+      - myapp-network
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    container_name: my-frontend
     ports:
       - "3000:3000"
-    environment:
-      - CHOKIDAR_USEPOLLING=true
     depends_on:
       - backend
     networks:
-      - mynetwork
+      - myapp-network
 
 networks:
-  mynetwork:
+  myapp-network:
+    driver: bridge
